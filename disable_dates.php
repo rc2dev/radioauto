@@ -9,7 +9,7 @@
 <body>
 
   <?php
-    define("FILE_PATH", "/opt/rc/ra_disabled.txt");
+    define("FILE_PATH", "/var/opt/scripts/radioauto_disabled");
     $result = "";
 
     // Save submited dates to file
