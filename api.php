@@ -10,11 +10,11 @@
     echo json_encode(getDates());
   }
 
-  if ($method == "POST" && $data->addDate != "") {
+  if ($method == "POST" && isset($data->addDate)) {
     addDate($data->addDate);
   }
 
-  if ($method == "POST" && $data->rmDate != "") {
+  if ($method == "POST" && isset($data->rmDate)) {
     rmDate($data->rmDate);
   }
 
