@@ -1,5 +1,5 @@
 const API_ENDPOINT = '/api.php';
-const ALERT_TIMEOUT = 4000;
+const ALERT_TIMEOUT = 3000;
 
 const data = {
   dates: []
@@ -65,7 +65,7 @@ const view = {
       const item = document.createElement('li');
       item.classList =
         'list-group-item d-flex justify-content-between align-items-center';
-      item.innerHTML = `${date}
+      item.innerHTML = `${this.friendlyDate(date)}
         <button class="trash btn btn-link" onclick="controller.rmDate('${date}');" >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -86,6 +86,15 @@ const view = {
     setTimeout(() => {
       alerts.removeChild(alert);
     }, ALERT_TIMEOUT);
+  },
+
+  friendlyDate: function(date) {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric'
+    });
   }
 };
 
