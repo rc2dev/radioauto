@@ -22,11 +22,12 @@
     global $config;
     $dates = file($config["disableFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     // "or die" has the false positive of an empty file
-    if ($dates === false)
-      die("Falha carregando o arquivo");
+    if ($dates === false) {
+      http_response_code(500);
+      die("Error opening file to read.");
+    }
 
-    $dates = filterOldDates($dates);
-    return $dates;
+    return filterOldDates($dates);
   }
 
   function filterOldDates($dates) {
@@ -47,10 +48,14 @@
   function addDate($date) {
     $dates = getDates();
 
-    if (isOldDate($date))
-      return;
-    if (in_array($date, $dates))
-      return;
+    if (isOldDate($date)) {
+      http_response_code(400);
+      die("Old date.");
+    }
+    if (in_array($date, $dates)) {
+      http_response_code(400);
+      die("Duplicate date.");
+    }
 
     array_push($dates, $date);
     sort($dates);
@@ -61,6 +66,9 @@
     $dates = getDates();
     if (($key = array_search($date, $dates)) !== false) {
       unset($dates[$key]);
+    } else {
+      http_response_code(400);
+      die("Date is not in list.");
     }
     saveToFile($dates);
   }
@@ -68,13 +76,17 @@
   function saveToFile($dates) {
     global $config;
     $fileHandle = fopen($config["disableFile"], "w");
-    if (!$fileHandle)
-      die("Erro abrindo o arquivo para salvar.");
+    if (!$fileHandle) {
+      http_response_code(500);
+      die("Error opening file to save.");
+    }
 
     foreach ($dates as $date)
       fwrite($fileHandle, $date.PHP_EOL);
 
-    if (!fclose($fileHandle))
-      die("Erro fechando o arquivo para salvar.");
+    if (!fclose($fileHandle)) {
+      http_response_code(400);
+      die("Error closing file to save.");
+    }
   }
 ?>
