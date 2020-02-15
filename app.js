@@ -49,3 +49,6 @@ const addDate = async () => {
 };
 
 populateDates();
+
+const today = new Date().toISOString().substr(0, 10);
+document.getElementById('newDate').setAttribute('min', today);
