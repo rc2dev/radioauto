@@ -26,7 +26,9 @@ const controller = {
   },
 
   addDate: async function() {
-    const newDate = document.getElementById('newDate').value;
+    const newDateEl = document.getElementById('newDate');
+    const newDate = newDateEl.value;
+    newDateEl.value = '';
 
     if (data.dates.includes(newDate)) {
       view.error('Data já selecionada.');
@@ -43,7 +45,22 @@ const controller = {
 
 const view = {
   init: function() {
+    this.addListeners();
     this.forbidPastPick();
+  },
+
+  addListeners: function() {
+    const form = document.getElementById('newDate-form');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      controller.addDate();
+    });
+
+    const newDate = document.getElementById('newDate');
+    newDate.addEventListener('change', function() {
+      const submit = document.getElementById('newDate-submit');
+      submit.disabled = newDate.value === '';
+    });
   },
 
   forbidPastPick: function() {
@@ -83,7 +100,7 @@ const view = {
     alert.innerHTML = message;
     alerts.appendChild(alert);
 
-    setTimeout(() => {
+    setTimeout(function() {
       alerts.removeChild(alert);
     }, ALERT_TIMEOUT);
   },

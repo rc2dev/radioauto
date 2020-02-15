@@ -13,22 +13,24 @@
     <span class="navbar-brand mb-0 h1">Despertador</span>
   </nav>
   <div class="container">
-    <h1 class="mb-5">Desativado nas datas</h1>
+    <h1 class="mb-5">Dias desativados</h1>
 
-    <form onsubmit="controller.addDate(); return false;">
+    <form id="newDate-form">
       <div class="form-group row">
         <div class="col">
           <input type="date" id="newDate" class="form-control">
         </div>
         <div class="col">
-          <button type="submit" class="btn btn-primary mb-2">Adicionar</button>
+          <button type="submit" id="newDate-submit" class="btn btn-primary mb-2" disabled>
+            Adicionar
+          </button>
         </div>
       </div>
     </form>
 
     <div id="alerts"></div>
 
-    <ul id="dates" class="list-group list-group-flush">
+    <ul id="dates" class="list-group list-group-flush mt-4">
       Carregando...
     </ul>
   </div>
