@@ -14,7 +14,8 @@
   </nav>
   <div class="container">
     <h1 class="mb-5">Desativado nas datas</h1>
-    <form onsubmit="addDate(); return false;">
+
+    <form onsubmit="controller.addDate(); return false;">
       <div class="form-group row">
         <div class="col">
           <input type="date" id="newDate" class="form-control">
@@ -24,6 +25,8 @@
         </div>
       </div>
     </form>
+
+    <div id="alerts"></div>
 
     <ul id="dates" class="list-group list-group-flush">
       Carregando...
