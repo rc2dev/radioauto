@@ -106,7 +106,7 @@ const view = {
   },
 
   friendlyDate: function(date) {
-    return new Date(date).toLocaleDateString('pt-BR', {
+    return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', {
       weekday: 'long',
       day: 'numeric',
       month: 'numeric',
