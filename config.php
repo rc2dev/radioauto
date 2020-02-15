@@ -1,5 +1,5 @@
 <?php
     return array(
-        'disableFile' => 'disable.txt'
+        'disableFile' => 'data/disable.txt'
     );
 ?>
