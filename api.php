@@ -45,10 +45,13 @@
   }
 
   function addDate($date) {
+    $dates = getDates();
+
     if (isOldDate($date))
       return;
+    if (in_array($date, $dates))
+      return;
 
-    $dates = getDates();
     array_push($dates, $date);
     sort($dates);
     saveToFile($dates);
