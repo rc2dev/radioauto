@@ -1,27 +1,32 @@
 const API_ENDPOINT = '/api.php';
 const ALERT_TIMEOUT = 2000;
 
-const data = {
+const model = {
   dates: []
 };
 
 const controller = {
   init: function() {
+    axios.interceptors.response.use(null, ex => {
+      const message = ex.response
+        ? `Erro inesperado: ${ex.response.data}`
+        : `Erro inesperado`;
+      view.showError(message);
+      return Promise.reject(ex);
+    });
+
     this.fetchData();
     view.init();
   },
 
   fetchData: async function() {
-    const response = await fetch(API_ENDPOINT);
-    data.dates = await response.json();
-    view.refreshData();
+    const response = await axios.get(API_ENDPOINT);
+    model.dates = response.data;
+    view.refreshDates();
   },
 
   rmDate: async function(date) {
-    await fetch(API_ENDPOINT, {
-      method: 'post',
-      body: JSON.stringify({ rmDate: date })
-    });
+    await axios.post(API_ENDPOINT, { rmDate: date });
     this.fetchData();
   },
 
@@ -30,15 +35,12 @@ const controller = {
     const newDate = newDateEl.value;
     newDateEl.value = '';
 
-    if (data.dates.includes(newDate)) {
-      view.error('Data já selecionada.');
+    if (model.dates.includes(newDate)) {
+      view.showError('Data já selecionada.');
       return;
     }
 
-    await fetch(API_ENDPOINT, {
-      method: 'post',
-      body: JSON.stringify({ addDate: newDate })
-    });
+    await axios.post(API_ENDPOINT, { addDate: newDate });
     this.fetchData();
   }
 };
@@ -61,6 +63,8 @@ const view = {
       const submit = document.getElementById('newDate-submit');
       submit.disabled = newDate.value === '';
     });
+
+    document.addEventListener('click', this.removeError);
   },
 
   forbidPastPick: function() {
@@ -68,8 +72,8 @@ const view = {
     document.getElementById('newDate').setAttribute('min', today);
   },
 
-  refreshData: function() {
-    const { dates } = data;
+  refreshDates: function() {
+    const { dates } = model;
     const list = document.getElementById('dates');
 
     if (dates.length === 0) {
@@ -93,16 +97,17 @@ const view = {
     }
   },
 
-  error: function(message) {
+  showError: function(message) {
     const alerts = document.getElementById('alerts');
     const alert = document.createElement('div');
     alert.classList = 'alert alert-danger';
     alert.innerHTML = message;
     alerts.appendChild(alert);
+  },
 
-    setTimeout(function() {
-      alerts.removeChild(alert);
-    }, ALERT_TIMEOUT);
+  removeError: function() {
+    const alerts = document.getElementById('alerts');
+    if (alerts.innerHTML != '') alerts.innerHTML = '';
   },
 
   friendlyDate: function(date) {
