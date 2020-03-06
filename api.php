@@ -1,6 +1,8 @@
 <?php
   $config = include("config.php");
 
+  createFile();
+
   $method = $_SERVER["REQUEST_METHOD"];
   $json = file_get_contents('php://input');
   $data = json_decode($json);
@@ -88,5 +90,13 @@
       http_response_code(400);
       die("Error closing file to save.");
     }
+  }
+
+  function createFile() {
+    global $config;
+
+    $path = $config["disableFile"];
+    if (!file_exists($path))
+      touch($path);
   }
 ?>
