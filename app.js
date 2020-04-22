@@ -2,35 +2,38 @@ const API_ENDPOINT = '/api.php';
 const ALERT_TIMEOUT = 2000;
 
 const model = {
-  dates: []
+  dates: [],
 };
 
 const controller = {
-  init: function() {
-    axios.interceptors.response.use(null, ex => {
+  init: async function () {
+    await view.init();
+    this.configAxios();
+    this.fetchData();
+  },
+
+  configAxios: function () {
+    axios.interceptors.response.use(null, (ex) => {
       const message = ex.response
-        ? `Erro inesperado: ${ex.response.data}`
-        : `Erro inesperado`;
+        ? `i18next.t('unExpectedError'): ${ex.response.data}`
+        : `i18next.t('unExpectedError')`;
       view.showError(message);
       return Promise.reject(ex);
     });
-
-    this.fetchData();
-    view.init();
   },
 
-  fetchData: async function() {
+  fetchData: async function () {
     const response = await axios.get(API_ENDPOINT);
     model.dates = response.data;
     view.refreshDates();
   },
 
-  rmDate: async function(date) {
+  rmDate: async function (date) {
     await axios.post(API_ENDPOINT, { rmDate: date });
     this.fetchData();
   },
 
-  addDate: async function() {
+  addDate: async function () {
     const newDateEl = document.getElementById('newDate');
     const newDate = newDateEl.value;
     newDateEl.value = '';
@@ -42,24 +45,36 @@ const controller = {
 
     await axios.post(API_ENDPOINT, { addDate: newDate });
     this.fetchData();
-  }
+  },
 };
 
 const view = {
-  init: function() {
+  init: async function () {
+    await this.initI18n();
     this.addListeners();
     this.forbidPastPick();
+    this.setStrings();
   },
 
-  addListeners: function() {
+  initI18n: function () {
+    return i18next
+      .use(i18nextHttpBackend)
+      .use(i18nextBrowserLanguageDetector)
+      .on('languageChanged', lang => {
+        document.documentElement.setAttribute('lang', lang);
+      })
+      .init({ fallbackLng: 'en' });
+  },
+
+  addListeners: function () {
     const form = document.getElementById('newDate-form');
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
       controller.addDate();
     });
 
     const newDate = document.getElementById('newDate');
-    newDate.addEventListener('change', function() {
+    newDate.addEventListener('change', function () {
       const submit = document.getElementById('newDate-submit');
       submit.disabled = newDate.value === '';
     });
@@ -67,17 +82,23 @@ const view = {
     document.addEventListener('click', this.removeError);
   },
 
-  forbidPastPick: function() {
+  forbidPastPick: function () {
     const today = new Date().toISOString().substr(0, 10);
     document.getElementById('newDate').setAttribute('min', today);
   },
 
-  refreshDates: function() {
+  setStrings: function () {
+    document.getElementById('brand').innerHTML = i18next.t('brand');
+    document.getElementById('title').innerHTML = i18next.t('disabledDays');
+    document.getElementById('newDate-submit').innerHTML = i18next.t('addDate');
+  },
+
+  refreshDates: function () {
     const { dates } = model;
     const list = document.getElementById('dates');
 
     if (dates.length === 0) {
-      list.innerHTML = 'Nenhuma data.';
+      list.innerHTML = i18next.t('noDates');
       return;
     }
 
@@ -97,7 +118,7 @@ const view = {
     }
   },
 
-  showError: function(message) {
+  showError: function (message) {
     const alerts = document.getElementById('alerts');
     const alert = document.createElement('div');
     alert.classList = 'alert alert-danger';
@@ -105,19 +126,19 @@ const view = {
     alerts.appendChild(alert);
   },
 
-  removeError: function() {
+  removeError: function () {
     const alerts = document.getElementById('alerts');
     if (alerts.innerHTML != '') alerts.innerHTML = '';
   },
 
-  friendlyDate: function(date) {
-    return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', {
+  friendlyDate: function (date) {
+    return new Date(date + 'T00:00:00').toLocaleDateString(i18next.language, {
       weekday: 'long',
       day: 'numeric',
       month: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     });
-  }
+  },
 };
 
 controller.init();
