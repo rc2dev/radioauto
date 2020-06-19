@@ -33,6 +33,8 @@ usage() {
 }
 
 check_holiday() {
+	[[ -f "$holidays" ]] || return 0
+
 	if grep -q "$(date +%Y-%m-%d)" "$holidays"; then
 		printf "Today is a holiday. Not doing anything.\n" >&2
 		exit 0
@@ -40,8 +42,10 @@ check_holiday() {
 }
 
 check_disabled() {
+	[[ -f "$disabled" ]] || return 0
+
 	if grep -q "$(date +%Y-%m-%d)" "$disabled"; then
-		printf "Radioauto was disabled for today. Not doing anything.\n" >&2
+		printf "Disabled for today. Not doing anything.\n" >&2
 		exit 0
 	fi
 }
