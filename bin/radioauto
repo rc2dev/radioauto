@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+#
+# Play and stop radio automagically.
+# Check for holidays and user disabling.
+#
+# Copyright (C) 2017-2020 Rafael Cavalcanti - rafaelc.org
+# Licensed under GPLv3
+
+# Host configuration
+readonly pa_sink="alsa_output.usb-GeneralPlus_USB_Audio_Device-00.analog-stereo"
+readonly alsa_card="2"
+readonly alsa_mixer="Speaker"
+readonly pifi_api="http://192.168.15.101:3030/api/player"
+
+# Call these commands quietly
+readonly mpc="mpc -q"
+readonly curl="curl -sS"
+
+# Paths
+readonly script_name=$(basename "$0")
+readonly script_dir="$(dirname "$(readlink -f "$0")")"
+readonly holidays="${script_dir}/../config/holidays.txt"
+readonly disabled="${script_dir}/../config/disabled.txt"
+readonly silent_track="${script_dir}/../assets/silence.ogg"
+
+usage() {
+	cat <<-END >&2
+	Usage:
+	  $script_name --start volume stream [backup_stream]
+	  $script_name --stop volume
+	END
+	exit 1
+}
+
+check_holiday() {
+	if grep -q "$(date +%Y-%m-%d)" "$holidays"; then
+		printf "Today is a holiday. Not doing anything.\n" >&2
+		exit 0
+	fi
+}
+
+check_disabled() {
+	if grep -q "$(date +%Y-%m-%d)" "$disabled"; then
+		printf "Radioauto was disabled for today. Not doing anything.\n" >&2
+		exit 0
+	fi
+}
+
+# Set volume accordingly depending on which sound system is used
+# (PulseAudio or ALSA).
+#
+# args: volume
+set_volume() {
+	if pactl list >/dev/null 2>&1; then
+		set_volume_pa "$1"
+	else
+		set_volume_alsa "$1"
+	fi
+}
+
+# Set volume when using ALSA.
+#
+# args: volume
+set_volume_alsa() {
+	amixer -c "$alsa_card" set "$alsa_mixer" unmute >/dev/null
+	$mpc volume "$1"
+}
+
+# Set volume when using PulseAudio.
+# It works even if $mpc doesn't have a source on PulseAudio.
+#
+# args: volume
+set_volume_pa() {
+	# Make sure PA sink isn't mute and it's at 100%.
+	pactl set-sink-mute "$pa_sink" false
+	pactl set-sink-volume "$pa_sink" 100%
+
+	# Set volume opening the source first
+	$mpc clear
+	$mpc add "$silent_track"
+	$mpc play
+	sleep 10
+	$mpc volume "$1"
+	$mpc clear
+}
+
+# args: stream backup_stream
+start_playback() {
+	$curl \
+		-F "method=play_radios" \
+		-F "params[]=$1" \
+		-F "params[]=${2:-$1}" \
+		$pifi_api > /dev/null
+}
+
+stop_playback() {
+	$mpc stop
+}
+
+# args: volume stream backup_stream
+start() {
+	check_holiday
+	check_disabled
+	set_volume "$1"
+	start_playback "$2" "$3"
+}
+
+# args: volume
+stop() {
+	check_holiday
+	check_disabled
+	stop_playback
+	set_volume "$1"
+}
+
+main() {
+	[[ $# == 0 ]] && usage
+	local command="$1"
+	shift
+
+	case "$command" in
+		--start)
+			[[ $# != 2 && $# != 3 ]] && usage
+			start "$@"
+			;;
+		--stop)
+			[[ $# != 1 ]] && usage
+			stop "$@"
+			;;
+		*)
+			usage
+			;;
+	esac
+}
+
+main "$@"

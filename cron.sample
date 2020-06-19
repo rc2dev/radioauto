@@ -1,0 +1,9 @@
+# This is a sample for a cronjob.
+# Make the relevant changes and drop it at /etc/cron.d
+#
+# Play radio automagically.
+
+# Weekdays
+00 06 * * 1-5 pi /path/to/radioauto --start 20 "My preferred radio"
+00 07 * * 1-5 pi /path/to/radioauto --stop 40
+

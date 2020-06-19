@@ -22,7 +22,7 @@
 
   function getDates() {
     global $config;
-    $dates = file($config["disableFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $dates = file($config["disabledFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     // "or die" has the false positive of an empty file
     if ($dates === false) {
       http_response_code(500);
@@ -77,7 +77,7 @@
 
   function saveToFile($dates) {
     global $config;
-    $fileHandle = fopen($config["disableFile"], "w");
+    $fileHandle = fopen($config["disabledFile"], "w");
     if (!$fileHandle) {
       http_response_code(500);
       die("Error opening file to save.");
@@ -95,7 +95,7 @@
   function createFile() {
     global $config;
 
-    $path = $config["disableFile"];
+    $path = $config["disabledFile"];
     if (!file_exists($path))
       touch($path);
   }
