@@ -7,9 +7,12 @@
 # Licensed under GPLv3
 
 # Host configuration
+# If using PulseAudio
 readonly pa_sink="alsa_output.usb-GeneralPlus_USB_Audio_Device-00.analog-stereo"
+# If using ALSA
 readonly alsa_card="2"
 readonly alsa_mixer="Speaker"
+# PiFi API: Leaving this empty will fallback to MPC
 readonly pifi_api="http://192.168.15.101:3030/api/player"
 
 # Call these commands quietly
@@ -90,10 +93,27 @@ set_volume_pa() {
 
 # args: stream backup_stream
 start_playback() {
+	if [[ -z "$pifi_api" ]]; then
+		start_playback_mpc "$1" "$2"
+	else
+		start_playback_pifi "$1" "$2"
+	fi
+}
+
+# args: stream backup_stream
+start_playback_mpc() {
+	$mpc clear
+	$mpc add "$1"
+	$mpc add "$2"
+	$mpc play
+}
+
+# args: stream backup_stream
+start_playback_pifi() {
 	$curl \
 		-F "method=play_radios" \
 		-F "params[]=$1" \
-		-F "params[]=${2:-$1}" \
+		-F "params[]=$2" \
 		$pifi_api > /dev/null
 }
 
@@ -106,7 +126,7 @@ start() {
 	check_holiday
 	check_disabled
 	set_volume "$1"
-	start_playback "$2" "$3"
+	start_playback "$2" "${3:-$2}"
 }
 
 # args: volume
