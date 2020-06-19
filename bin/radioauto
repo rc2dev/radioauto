@@ -6,31 +6,23 @@
 # Copyright (C) 2017-2020 Rafael Cavalcanti - rafaelc.org
 # Licensed under GPLv3
 
-# Host configuration
-# If using PulseAudio
-readonly pa_sink="alsa_output.usb-GeneralPlus_USB_Audio_Device-00.analog-stereo"
-# If using ALSA
-readonly alsa_card="2"
-readonly alsa_mixer="Speaker"
-# PiFi API: Leaving this empty will fallback to MPC
-readonly pifi_api="http://192.168.15.101:3030/api/player"
+# Paths
+readonly script_name=$(basename "$0")
+readonly script_dir="$(dirname "$(readlink -f "$0")")"
+readonly config="${script_dir}/../config/host.conf"
+readonly holidays="${script_dir}/../config/holidays.txt"
+readonly disabled="${script_dir}/../config/disabled.txt"
+readonly silent_track="${script_dir}/../assets/silence.ogg"
 
 # Call these commands quietly
 readonly mpc="mpc -q"
 readonly curl="curl -sS"
 
-# Paths
-readonly script_name=$(basename "$0")
-readonly script_dir="$(dirname "$(readlink -f "$0")")"
-readonly holidays="${script_dir}/../config/holidays.txt"
-readonly disabled="${script_dir}/../config/disabled.txt"
-readonly silent_track="${script_dir}/../assets/silence.ogg"
-
 usage() {
 	cat <<-END >&2
 	Usage:
-	  $script_name --start volume stream [backup_stream]
-	  $script_name --stop volume
+		$script_name --start volume stream [backup_stream]
+		$script_name --stop volume
 	END
 	exit 1
 }
@@ -114,7 +106,7 @@ start_playback_pifi() {
 		-F "method=play_radios" \
 		-F "params[]=$1" \
 		-F "params[]=$2" \
-		$pifi_api > /dev/null
+		"$pifi_api" > /dev/null
 }
 
 stop_playback() {
@@ -137,7 +129,25 @@ stop() {
 	set_volume "$1"
 }
 
+source_config() {
+	if [[ ! -f "$config" ]]; then
+		printf "Config file at %s missing.\n" "$config"
+		exit 1
+	fi
+
+	while IFS="=" read -r key value; do
+		case "$key" in
+			"pa_sink") readonly pa_sink="$value" ;;
+			"alsa_card") readonly alsa_card="$value" ;;
+			"alsa_mixer") readonly alsa_mixer="$value" ;;
+			"pifi_api") readonly pifi_api="$value" ;;
+		esac
+	done < "$config"
+}
+
 main() {
+	source_config
+
 	[[ $# == 0 ]] && usage
 	local command="$1"
 	shift

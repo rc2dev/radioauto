@@ -1,0 +1,17 @@
+# Host configuration
+#
+# key=value
+# Don't use quotes.
+
+
+# Fill this if using ALSA.
+alsa_card=
+alsa_mixer=
+
+# Fill this if using PulseAudio.
+pa_sink=
+
+# PiFi API. If you don't use PiFi, just leave it empty, and it will
+# fallback to mpc.
+pifi_api=
+
