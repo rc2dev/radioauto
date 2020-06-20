@@ -21,6 +21,7 @@ readonly curl="curl -sS"
 main() {
 	source_config
 	parse_args "$@"
+	check_deps
 
 	check_holiday
 	check_disabled
@@ -49,6 +50,14 @@ parse_args() {
 	esac
 }
 
+check_deps() {
+	for dep in mpc curl grep; do
+		if ! command -v "$dep" > /dev/null; then
+			printf "Please install %s first.\n" "$dep"
+			exit 1
+		fi
+	done
+}
 usage() {
 	cat <<-END >&2
 	Usage:
