@@ -48,7 +48,12 @@ It consists of:
 
   If you are not familiar with cron, read [`man 5 crontab`](https://linux.die.net/man/5/crontab).
 
-5. _(Optional: web interface)_ Point your webserver root to the `web` directory. Enable PHP.
+5. _(Optional: web interface)_ Point your webserver root to the `web` directory and enable PHP.
+  Be sure to allow it to read/write the `config` directory:
+  ```
+  sudo chgrp www-data /opt/radiodata/config
+  sudo chmod g+rwx /opt/radiodata/config
+  ```
 
 6. _(Optional: holidays)_ To prevent radioauto to run on holidays, create `config/holidays.txt`.
   This file should contain the holidays in the format `MM-DD` or `YYYY-MM-DD`, one per line.
