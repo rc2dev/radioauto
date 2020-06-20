@@ -50,13 +50,14 @@ It consists of:
 
 5. _(Optional: web interface)_ Point your webserver root to the `web` directory. Enable PHP.
 
+6. _(Optional: holidays)_ To prevent radioauto to run on holidays, create `config/holidays.txt`.
+  This file should contain the holidays in the format `MM-DD` or `YYYY-MM-DD`, one per line.
+
 ## Usage
 
-Now your Pi should play and stop streaming on the time you pick.
+Your Pi should automatically start and stop streaming at the configured time.
 
-If you ever need to disable the playback for a specific date, just access the web interface.
-
-If you want the Pi to ignore the schedule on holidays, drop a plain text file at `/opt/radioauto/config/holidays.txt` with the dates in the format `YYYY-MM-DD`.
+If you ever need to disable it ad-hoc for a specific date, just access the web interface.
 
 ## Credits
 
