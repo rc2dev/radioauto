@@ -15,8 +15,8 @@ const controller = {
   configAxios: function () {
     axios.interceptors.response.use(null, (ex) => {
       const message = ex.response
-        ? `i18next.t('unExpectedError'): ${ex.response.data}`
-        : `i18next.t('unExpectedError')`;
+        ? `${i18next.t('unExpectedError')}: ${ex.response.data}`
+        : `${i18next.t('unExpectedError')}`;
       view.showError(message);
       return Promise.reject(ex);
     });
