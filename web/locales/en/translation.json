@@ -2,5 +2,6 @@
   "brand": "Alarm",
   "noDates": "No dates.",
   "disabledDays": "Disabled days",
-  "addDate": "Add"
+  "addDate": "Add",
+  "unExpectedError": "Unexpected error"
 }

@@ -2,5 +2,6 @@
   "brand": "Despertador",
   "noDates": "Nenhuma data.",
   "disabledDays": "Dias desativados",
-  "addDate": "Adicionar"
+  "addDate": "Adicionar",
+  "unExpectedError": "Erro inesperado"
 }
