@@ -1,9 +1,22 @@
-# This is a sample for a cronjob.
-# Make the relevant changes and drop it at /etc/cron.d
+# This is a sample cronjob for radioauto.
+# Make the relevant changes and drop it at /etc/cron.d.
 #
-# Play radio automagically.
+# The arguments for the script are:
+# * For playing: --start volume stream [stream_backup]
+# * For stopping: --stop volume
+#
+# Where:
+# * volume: the volume to play the radio or for after the playback
+# * stream: the URL for the radio (or the name if using PiFi API)
+# * stream_backup: a optional secondary backup if the first fails
+#
+
+script="/opt/radioauto/bin/radioauto"
 
 # Weekdays
-00 06 * * 1-5 pi /path/to/radioauto --start 20 "My preferred radio"
-00 07 * * 1-5 pi /path/to/radioauto --stop 40
+00 06 * * 1-5 pi "$script" --start 20 "My preferred radio"
+00 07 * * 1-5 pi "$script" --stop 40
 
+# Weekends
+00 06 * * 6-7 pi "$script" --start 30 "My weekend radio"
+00 07 * * 6-7 pi "$script" --stop 40

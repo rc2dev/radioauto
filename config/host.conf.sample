@@ -5,13 +5,14 @@
 
 
 # Fill this if using ALSA.
+# Check `alsamixer` for the values.
 alsa_card=
 alsa_mixer=
 
 # Fill this if using PulseAudio.
+# Check `pactl list sinks short` for the value.
 pa_sink=
 
 # PiFi API. If you don't use PiFi, just leave it empty, and it will
 # fallback to mpc.
 pifi_api=
-
