@@ -18,10 +18,41 @@ readonly silent_track="${script_dir}/../assets/silence.ogg"
 readonly mpc="mpc -q"
 readonly curl="curl -sS"
 
+main() {
+	source_config
+	parse_args "$@"
+
+	check_holiday
+	check_disabled
+
+	$command
+}
+
+parse_args() {
+	readonly command="${1#--}"
+	shift
+
+	case "$command" in
+		start)
+			[[ $# != 2 && $# != 3 ]] && usage
+			readonly volume="$1"
+			readonly stream="$2"
+			readonly stream_backup="${3:-$2}"
+			;;
+		stop)
+			[[ $# != 1 ]] && usage
+			readonly volume="$1"
+			;;
+		*)
+			usage
+			;;
+	esac
+}
+
 usage() {
 	cat <<-END >&2
 	Usage:
-		$script_name --start volume stream [backup_stream]
+		$script_name --start volume stream [stream_backup]
 		$script_name --stop volume
 	END
 	exit 1
@@ -47,28 +78,22 @@ check_disabled() {
 
 # Set volume accordingly depending on which sound system is used
 # (PulseAudio or ALSA).
-#
-# args: volume
 set_volume() {
 	if pactl list >/dev/null 2>&1; then
-		set_volume_pa "$1"
+		set_volume_pa
 	else
-		set_volume_alsa "$1"
+		set_volume_alsa
 	fi
 }
 
 # Set volume when using ALSA.
-#
-# args: volume
 set_volume_alsa() {
 	amixer -c "$alsa_card" set "$alsa_mixer" unmute >/dev/null
-	$mpc volume "$1"
+	$mpc volume "$volume"
 }
 
 # Set volume when using PulseAudio.
 # It works even if $mpc doesn't have a source on PulseAudio.
-#
-# args: volume
 set_volume_pa() {
 	# Make sure PA sink isn't mute and it's at 100%.
 	pactl set-sink-mute "$pa_sink" false
@@ -79,54 +104,30 @@ set_volume_pa() {
 	$mpc add "$silent_track"
 	$mpc play
 	sleep 10
-	$mpc volume "$1"
+	$mpc volume "$volume"
 	$mpc clear
 }
 
-# args: stream backup_stream
-start_playback() {
-	if [[ -z "$pifi_api" ]]; then
-		start_playback_mpc "$1" "$2"
+start() {
+	set_volume "$volume"
+
+	if [[ -n "$pifi_api" ]]; then
+		$curl \
+			-F "method=play_radios" \
+			-F "params[]=$stream" \
+			-F "params[]=$stream_backup" \
+			"$pifi_api" > /dev/null
 	else
-		start_playback_pifi "$1" "$2"
+		$mpc clear
+		$mpc add "$stream"
+		$mpc add "$stream_backup"
+		$mpc play
 	fi
 }
 
-# args: stream backup_stream
-start_playback_mpc() {
-	$mpc clear
-	$mpc add "$1"
-	$mpc add "$2"
-	$mpc play
-}
-
-# args: stream backup_stream
-start_playback_pifi() {
-	$curl \
-		-F "method=play_radios" \
-		-F "params[]=$1" \
-		-F "params[]=$2" \
-		"$pifi_api" > /dev/null
-}
-
-stop_playback() {
-	$mpc stop
-}
-
-# args: volume stream backup_stream
-start() {
-	check_holiday
-	check_disabled
-	set_volume "$1"
-	start_playback "$2" "${3:-$2}"
-}
-
-# args: volume
 stop() {
-	check_holiday
-	check_disabled
-	stop_playback
-	set_volume "$1"
+	$mpc stop
+	set_volume "$volume"
 }
 
 source_config() {
@@ -143,28 +144,6 @@ source_config() {
 			"pifi_api") readonly pifi_api="$value" ;;
 		esac
 	done < "$config"
-}
-
-main() {
-	source_config
-
-	[[ $# == 0 ]] && usage
-	local command="$1"
-	shift
-
-	case "$command" in
-		--start)
-			[[ $# != 2 && $# != 3 ]] && usage
-			start "$@"
-			;;
-		--stop)
-			[[ $# != 1 ]] && usage
-			stop "$@"
-			;;
-		*)
-			usage
-			;;
-	esac
 }
 
 main "$@"
