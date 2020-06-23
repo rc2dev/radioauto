@@ -9,10 +9,11 @@
 # Paths
 readonly script_name=$(basename "$0")
 readonly script_dir="$(dirname "$(readlink -f "$0")")"
-readonly config="${script_dir}/../config/host.conf"
-readonly holidays="${script_dir}/../config/holidays.txt"
-readonly disabled="${script_dir}/../config/disabled.txt"
+readonly config_dir="/etc/radioauto"
 readonly silent_track="${script_dir}/../assets/silence.ogg"
+readonly config="${config_dir}/host.conf"
+readonly holidays="${config_dir}/holidays.txt"
+readonly disabled="${config_dir}/disabled.txt"
 
 # Call these commands quietly
 readonly mpc="mpc -q"

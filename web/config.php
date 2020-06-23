@@ -1,5 +1,5 @@
 <?php
     return array(
-        'disabledFile' => '../config/disabled.txt'
+        'disabledFile' => '/etc/radioauto/disabled.txt'
     );
 ?>

@@ -22,8 +22,7 @@ It consists of:
 
 ## Installation
 
-1. Install the dependencies:
-  On Raspbian:
+1. Install the dependencies.  On Raspbian:
   ```
   $ sudo apt install mpc mpd
   ```
@@ -33,14 +32,14 @@ It consists of:
   $ sudo git clone https://github.com/rccavalcanti/radioauto.git /opt/radioauto
   ```
 
-3. Create a configuration for the host from the sample:
+3. Configure the host parameters:
   ```
-  $ cd /opt/radioauto/config
-  $ sudo cp host.conf{.sample,}
-  $ sudo -e host.conf
+  $ sudo mkdir /etc/radioauto
+  $ sudo cp /opt/radioauto/host.conf.sample /etc/radioauto/host.conf
+  $ sudo -e /etc/radioauto/host.conf
   ```
 
-4. Create a cronjob from the sample:
+4. Create the cronjob from the sample:
   ```
   $ sudo cp /opt/radioauto/cron.sample /etc/cron.d/radioauto
   $ sudo -e /etc/cron.d/radioauto
@@ -49,14 +48,19 @@ It consists of:
   If you are not familiar with cron, read [`man 5 crontab`](https://linux.die.net/man/5/crontab).
 
 5. _(Optional: web interface)_ Point your webserver root to the `web` directory and enable PHP.
-  Be sure to allow it to read/write the `config` directory:
+
+  Be sure to allow it to read/write the configuration directory:
   ```
-  sudo chgrp www-data /opt/radiodata/config
-  sudo chmod g+rwx /opt/radiodata/config
+  $ sudo chgrp www-data /etc/radiodata
+  $ sudo chmod g+rwx /etc/radiodata
   ```
 
-6. _(Optional: holidays)_ To prevent radioauto to run on holidays, create `config/holidays.txt`.
-  This file should contain the holidays in the format `MM-DD` or `YYYY-MM-DD`, one per line.
+6. _(Optional: holidays)_ To prevent radioauto to run on holidays:
+  ```
+  $ sudo -e /etc/radioauto/holidays.txt
+  ```
+
+  Fill this file with the holidays in the format `MM-DD` or `YYYY-MM-DD`, one per line.
 
 ## Usage
 
