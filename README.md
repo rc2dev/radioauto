@@ -35,13 +35,13 @@ It consists of:
 3. Configure the host parameters:
   ```
   $ sudo mkdir /etc/radioauto
-  $ sudo cp /opt/radioauto/host.conf.sample /etc/radioauto/host.conf
+  $ sudo cp /opt/radioauto/docs/host.conf.sample /etc/radioauto/host.conf
   $ sudo -e /etc/radioauto/host.conf
   ```
 
 4. Create the cronjob from the sample:
   ```
-  $ sudo cp /opt/radioauto/cron.sample /etc/cron.d/radioauto
+  $ sudo cp /opt/radioauto/docs/cron.sample /etc/cron.d/radioauto
   $ sudo -e /etc/cron.d/radioauto
   ```
 
