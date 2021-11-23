@@ -12,7 +12,7 @@ It consists of:
 - a Bash script for the missing flexibility: check for holidays, disable specific dates, set the volume, etc
 - a (optional) web interface to disable running on specific dates easily
 
-[Related blog post.](https://rafaelc.org/tech/p/smart-morning-radio-with-raspberry-pi-cron-and-mpd/)
+[Related blog post.](https://rafaelc.org/posts/smart-morning-radio-with-raspberry-pi-cron-and-mpd/)
 
 ## Dependencies
 
@@ -29,7 +29,7 @@ It consists of:
 
 2. Clone the repo:
   ```
-  $ sudo git clone https://github.com/rccavalcanti/radioauto.git /opt/radioauto
+  $ sudo git clone https://github.com/rc2dev/radioauto.git /opt/radioauto
   ```
 
 3. Configure the host parameters:
