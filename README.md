@@ -76,4 +76,4 @@ If you ever need to disable it ad-hoc for a specific date, just access the web i
 
 Licensed under [GPLv3](LICENSE)
 
-Copyright (C) 2017-2020 [Rafael Cavalcanti](https://rafaelc.org/)
+Copyright (C) 2017-2020 [Rafael Cavalcanti](https://rafaelc.org/dev)
